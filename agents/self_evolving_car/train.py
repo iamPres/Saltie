@@ -79,7 +79,7 @@ class PythonExample(BaseAgent):
         # KILL
         if (my_car.physics.location.z < 100 or my_car.physics.location.z > 1950 or my_car.physics.location.x < -4000 or
             my_car.physics.location.x > 4000 or my_car.physics.location.y > 5000
-            or my_car.physics.location.y < -5000) and self.frame > 50:
+                or my_car.physics.location.y < -5000) and self.frame > 50:
             self.frame = self.max_frames
 
         # LOOPS
@@ -89,13 +89,14 @@ class PythonExample(BaseAgent):
             self.attempt += 1
             self.frame = 0
             try:
+                self.calc_min_fitness()
                 self.reset()  # reset at start
             except:
                 pass
 
         if self.attempt > 4:
             self.attempt = 0
-            self.calc_min_fitness()
+            self.calc_fitness()
             self.brain += 1  # change bot every reset
             self.controller_state = SimpleControllerState()  # reset controller
             self.reset()
@@ -103,8 +104,7 @@ class PythonExample(BaseAgent):
         if self.brain >= self.pop:
             self.gen += 1
             self.brain = 0  # reset bots after all have gone
-            self.calc_fitness()
-            # self.avg_best_fitness()
+            self.avg_best_fitness()
             self.calc_fittest()
 
             # PRINT GENERATION INFO
@@ -127,7 +127,7 @@ class PythonExample(BaseAgent):
 
     def calc_min_fitness(self):
         # CALCULATE MINIMUM DISTANCE TO BALL FOR EACH ATTEMPT
-        self.min_distance_to_ball[self.attempt] = min(self.distance_to_ball)
+        self.min_distance_to_ball.append(min(self.distance_to_ball))
         self.distance_to_ball = [math.inf] * self.max_frames
 
     def calc_fitness(self):

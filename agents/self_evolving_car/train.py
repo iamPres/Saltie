@@ -22,12 +22,12 @@ class PythonExample(BaseAgent):
         self.frame = 0  # frame counter for timed reset
         self.brain = 0  # bot counter for generation reset
         self.pop = 10  # population for bot looping
-        self.num_best = 5
+        self.num_best = 2
         self.gen = 0
         self.min_distance_to_ball = []
-        self.ball_set = ((0, -1500, 0), (0, 0, 0)), ((1000, 0, 1000), (0, -1500, 0)), \
-                        ((-1000, 0, 1000), (0, -1500, 0)), ((-3000, -3000, 1000), (1500, 0, 0)), \
-                        ((3000, -3000, 1000), (-1500, 0, 0))
+        self.ball_set = ((0, 1000, 0), (0, 0, 0)), ((1000, 0, 1000), (0, 0, 0)), \
+                        ((-1000, 0, 1000), (0, 0, 0)), ((-2000, -2000, 1000), (0, 0, 0)), \
+                        ((2000, -2000, 1000), (0, 0, 0))
         self.attempt = 0
         self.max_frames = 5000
         self.bot_list = [self.Model() for _ in range(self.pop)]  # list of Individual() objects
@@ -60,8 +60,8 @@ class PythonExample(BaseAgent):
         draw_debug(self.renderer, action_display)
 
         # STOP EVOLVING WHEN THE BALL IS TOUCHED
-        if packet.game_ball.latest_touch.player_name == "Self-Evolving-Car":
-            self.mut_rate = 0
+        #if packet.game_ball.latest_touch.player_name == "Self-Evolving-Car":
+        #  self.mut_rate = 0
 
         # GAME STATE
         car_state = CarState(boost_amount=100)
@@ -97,6 +97,7 @@ class PythonExample(BaseAgent):
         if self.attempt > 4:
             self.attempt = 0
             self.calc_fitness()
+            self.min_distance_to_ball = []
             self.brain += 1  # change bot every reset
             self.controller_state = SimpleControllerState()  # reset controller
             self.reset()
@@ -156,7 +157,7 @@ class PythonExample(BaseAgent):
         # RESET TRAINING ATTRIBUTES AFTER EACH GENOME
         ball_state = BallState(Physics(location=Vector3(pos[0], pos[1], pos[2])))
         car_state = CarState(jumped=False, double_jumped=False, boost_amount=33,
-                             physics=Physics(rotation=Rotator(0, 8, 0), velocity=Vector3(0, 0, 0),
+                             physics=Physics(rotation=Rotator(45, 8, 0), velocity=Vector3(0, 0, 0),
                                              angular_velocity=Vector3(0, 0, 0), location=Vector3(0.0, -4608, 500)))
         game_info_state = GameInfoState(game_speed=1)
         game_state = GameState(ball=ball_state, cars={self.index: car_state}, game_info=game_info_state)
@@ -171,6 +172,7 @@ class PythonExample(BaseAgent):
 
     def mutate(self):
         # MUTATE FIRST GENOMES
+        self.mut_rate = self.bot_fitness[self.fittest] / 5000
         for i, bot in enumerate(self.bot_list[:-self.num_best]):
             new_genes = self.Model()
             for param, param_new in zip(bot.parameters(), new_genes.parameters()):

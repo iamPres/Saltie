@@ -67,7 +67,7 @@ class PythonExample(BaseAgent):
         car_state = CarState(boost_amount=100)
         velocity = self.ball_set[self.attempt][1]
         ball_state = BallState(
-            Physics(velocity=Vector3(velocity[0], velocity[1], velocity[2]), location=Vector3(z=1000)))
+            Physics(angular_velocity=Vector3(0, 0, 0), velocity=Vector3(velocity[0], velocity[1], velocity[2]), location=Vector3(z=1000)))
         game_state = GameState(ball=ball_state, cars={self.index: car_state})
         self.set_game_state(game_state)
 

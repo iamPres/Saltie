@@ -172,7 +172,7 @@ class PythonExample(BaseAgent):
 
     def mutate(self):
         # MUTATE FIRST GENOMES
-        self.mut_rate = self.bot_fitness[self.fittest] / 5000
+        self.mut_rate = self.bot_fitness[self.fittest] / 10000
         for i, bot in enumerate(self.bot_list[:-self.num_best]):
             new_genes = self.Model()
             for param, param_new in zip(bot.parameters(), new_genes.parameters()):

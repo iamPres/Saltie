@@ -83,46 +83,28 @@ class PythonExample(BaseAgent):
             self.frame = self.max_frames
 
         # LOOPS
-        self.frame = self.frame + 1
-
+        self.frame += 1
         if self.frame >= self.max_frames:
-            self.attempt += 1
             self.frame = 0
-            try:
-                self.calc_min_fitness()
-                self.reset()  # reset at start
-            except:
-                pass
 
-        if self.attempt > 4:
-            self.attempt = 0
-            self.calc_fitness()
-            self.min_distance_to_ball = []
-            self.brain += 1  # change bot every reset
+            self.calc_min_fitness()
+
+            self.attempt += 1
+            if self.attempt >= 5:
+                self.attempt = 0
+
+                self.calc_fitness()
+
+                self.brain += 1  # change bot every reset
+                if self.brain >= self.pop:
+                    self.brain = 0  # reset bots after all have gone
+
+                    self.next_generation()
+
+                    self.gen += 1
+
             self.controller_state = SimpleControllerState()  # reset controller
-            self.reset()
-
-        if self.brain >= self.pop:
-            self.gen += 1
-            self.brain = 0  # reset bots after all have gone
-            self.avg_best_fitness()
-            self.calc_fittest()
-
-            # PRINT GENERATION INFO
-            print("")
-            print("     GEN = " + str(self.gen))
-            print("-------------------------")
-            print("FITTEST = BOT " + str(self.fittest))
-            print("------FITNESS = " + str(self.bot_fitness[self.fittest]))
-            # print("------WEIGHTS = " + str(self.bot_list[self.fittest]))
-            for i in range(len(self.bot_list)):
-                print("FITNESS OF BOT " + str(i) + " = " + str(self.bot_fitness[i]))
-
-            # NE Functions
-
-            self.selection()
-            self.mutate()
-            self.reset()  # reset because of delay
+            self.reset()  # reset at start
 
         return self.controller_state
 
@@ -137,8 +119,27 @@ class PythonExample(BaseAgent):
         sum1 /= len(self.min_distance_to_ball)
 
         self.bot_fitness[self.brain] = sum1
+        self.min_distance_to_ball = []
 
         return sum1
+
+    def next_generation(self):
+        self.avg_best_fitness()
+        self.calc_fittest()
+
+        # PRINT GENERATION INFO
+        print("")
+        print("     GEN = " + str(self.gen))
+        print("-------------------------")
+        print("FITTEST = BOT " + str(self.fittest))
+        print("------FITNESS = " + str(self.bot_fitness[self.fittest]))
+        # print("------WEIGHTS = " + str(self.bot_list[self.fittest]))
+        for i in range(len(self.bot_list)):
+            print("FITNESS OF BOT " + str(i) + " = " + str(self.bot_fitness[i]))
+
+        # NE Functions
+        self.selection()
+        self.mutate()
 
     def avg_best_fitness(self):
         # CALCULATE AVG FITNESS OF 5 FITTEST (IDENTICAL) GENOMES

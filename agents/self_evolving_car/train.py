@@ -55,7 +55,7 @@ class PythonExample(BaseAgent):
             distance_to_ball_x ** 2 + distance_to_ball_y ** 2 + distance_to_ball_z ** 2)
 
         # RENDER RESULTS
-        action_display = "GEN: " + str(self.gen + 1) + " | BOT: " + str(self.brain)
+        action_display = "GEN: " + str(self.gen + 1) + " | BOT: " + str(self.brain + 1)
 
         draw_debug(self.renderer, action_display)
 
@@ -121,21 +121,20 @@ class PythonExample(BaseAgent):
         self.bot_fitness[self.brain] = sum1
         self.min_distance_to_ball = []
 
-        return sum1
-
     def next_generation(self):
         self.avg_best_fitness()
         self.calc_fittest()
 
         # PRINT GENERATION INFO
         print("")
-        print("     GEN = " + str(self.gen))
+        print("     GEN = " + str(self.gen + 1))
         print("-------------------------")
-        print("FITTEST = BOT " + str(self.fittest))
+        print("FITTEST = BOT " + str(self.fittest + 1))
         print("------FITNESS = " + str(self.bot_fitness[self.fittest]))
         # print("------WEIGHTS = " + str(self.bot_list[self.fittest]))
         for i in range(len(self.bot_list)):
-            print("FITNESS OF BOT " + str(i) + " = " + str(self.bot_fitness[i]))
+            print("FITNESS OF BOT " + str(i + 1) + " = " + str(self.bot_fitness[i]))
+        print("------MUTATION RATE = " + str(self.mut_rate))
 
         # NE Functions
         self.selection()

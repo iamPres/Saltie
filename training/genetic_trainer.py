@@ -62,11 +62,11 @@ if __name__ == '__main__':
                 logger.info("BOT: "+str(bot)+" "+str(fitness[bot]))#+str(models[bot].state_dict())) # Log Info
                 fittest = ga.calc_fittest(fitness) # Calculate fittest bot
 
-                bot += 1
-
                 if isinstance(result.grade, Pass):
-                    torch.save(model.state_dict(), f'exercise_{result.reproduction_info.playlist_index}.mdl')
+                    torch.save(models[bot].state_dict(), f'exercise_{result.reproduction_info.playlist_index}.mdl')
                     break
+
+                bot += 1
 
             ga.crossover(models[fittest], models)
             ga.mutate(models[:num_fittest], mut_rate)

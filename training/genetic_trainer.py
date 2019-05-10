@@ -36,6 +36,27 @@ def create_on_briefing(send_model: Module) -> Callable:
         return None
     return on_briefing
 
+def crossover(parent1, list):
+    """ create new child with some weights from both parents
+    :param parent1 is a parent
+    :param list is the list to duplicate upon
+    :returns new parameters from both parents"""
+
+    state_dict = parent1.state_dict()
+    for bot in list:
+        bot.load_state_dict(state_dict)
+
+        """param_new = []
+        for param1, param2 in zip(parent1.parameters(), parent2.parameters()):
+            param_new = self.torch.rand(param1.data.size())
+            for index, value in enumerate(param_new):
+                if index <= 4:
+                    param_new.data[index] = param1.data[index]
+                else:
+                    param_new.data[index] = param2.data[index]
+
+        return param_new.data"""
+
 def mutate(list, mut_rate):
     """Randomizes a certain amount of the first five models' parameters based on mutation rate
     :param list contains the parameters to be mutated
@@ -54,9 +75,9 @@ def calc_fittest(list):
 
     index = 0
     temp = math.inf
-    for count, i in enumerate(list):
-        if i < temp:
-            temp = i
+    for count, fitness in enumerate(list):
+        if fitness < temp:
+            temp = fitness
             index = count
     return index
 
@@ -66,14 +87,9 @@ if __name__ == '__main__':
     gen = 0 # Init generation count
     bot_count = 10
     fitness = [0]*bot_count # Init fitness matrix
-    fittert = 0
-    models = [SymmetricModel()] * bot_count
+    fittest = math.inf
+    models = [SymmetricModel().share_memory() for _ in range(bot_count)]
     mut_rate = 0.2
-
-    # model.load_state_dict(torch.load(f'exercise_0.mdl'))
-    for model in models:
-        model.share_memory()
-        model.load_state_dict(SymmetricModel().state_dict())  # Load random model
 
     with setup_manager_context() as setup_manager:
         while True:
@@ -86,14 +102,12 @@ if __name__ == '__main__':
 
                 result = next(run_playlist(playlist, setup_manager=setup_manager)) # Get result
                 fitness[bot] = result.grade.loss # Assign Fitness
-                logger.info("BOT: "+str(bot)+" "+str(fitness[bot])) # Log Info
+                logger.info("BOT: "+str(bot)+" "+str(fitness[bot]))#+str(models[bot].state_dict())) # Log Info
                 fittest = calc_fittest(fitness) # Calculate fittest bot
 
                 bot += 1
 
-            for model in models:
-                model.state_dict = models[fittest].state_dict
-
-            mutate(models, mut_rate)
+            #crossover(models[fittest], models)
+            #mutate(models, mut_rate)
 
             print("GENERATION: "+str(gen)+" | "+"FITTEST: "+str(fittest))
